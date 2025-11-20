@@ -1,4 +1,4 @@
-# 🚀 TaskMaster — Project & Task Management System (Django)
+# 🚀 TaskMaster — Project & Task Management System (Django)-- https://klickit2015.pythonanywhere.com/projects/
 
 TaskMaster is a full-featured **project management and team collaboration** platform built with  
 **Django + Tailwind CSS**, featuring authentication, role-based access, project tracking, kanban board,  
@@ -7,6 +7,7 @@ task management, comments, and a modern UI.
 ---
 <img width="1919" height="996" alt="image" src="https://github.com/user-attachments/assets/55a8b899-298c-452b-99be-a451d81477de" />
 
+<img width="1914" height="999" alt="image" src="https://github.com/user-attachments/assets/8d32497b-707a-4456-aaf9-e81a9ffbd6bf" />
 
 ## ⭐ Features
 
@@ -123,9 +124,7 @@ You can upload images inside a /screenshots folder:
 
 scss
 Copy code
-<img width="1920" height="955" alt="image" src="https://github.com/user-attachments/assets/35712adb-314e-4633-9fbf-4b1686e2d543" />
 
-<img width="1919" height="996" alt="image" src="https://github.com/user-attachments/assets/2d94436a-4413-446c-bdf6-0fb2603fdf8a" />
 
 🎯 Future Enhancements
 WebSockets (real-time task update)
@@ -186,6 +185,7 @@ Copy code
 Bol dena — main turbo-short version bhi bana dunga.
 
 Agar README me **project screenshots**, **demo video**, **badges**, **install script**, **logo** add karna ho to bhi batao bhai ❤️🚀
+
 
 
 

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Task - TaskMaster{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto fade-in">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            <i class="fas fa-plus-circle mr-2 text-blue-600"></i>Create New Task
+        </h1>
+        <p class="text-gray-600">Add a new task to your project</p>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <!-- Project Info Banner -->
+        <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
+            <p class="text-sm text-gray-700">
+                <i class="fas fa-folder text-blue-600 mr-2"></i>
+                Creating task for project: <strong class="text-blue-600">{{ project.name }}</strong>
+            </p>
+        </div>
+
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Task Title -->
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">
+                    <i class="fas fa-heading mr-2 text-blue-600"></i>Task Title *
+                </label>
+                <input type="text" name="title" required 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    placeholder="e.g., Design homepage mockup">
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">
+                    <i class="fas fa-align-left mr-2 text-blue-600"></i>Description *
+                </label>
+                <textarea name="description" required rows="4"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    placeholder="Describe what needs to be done..."></textarea>
+            </div>
+
+            <!-- Priority and Status -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <i class="fas fa-exclamation-circle mr-2 text-orange-600"></i>Priority *
+                    </label>
+                    <select name="priority" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <option value="low">🟢 Low</option>
+                        <option value="medium" selected>🟡 Medium</option>
+                        <option value="high">🟠 High</option>
+                        <option value="urgent">🔴 Urgent</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <i class="fas fa-tasks mr-2 text-blue-600"></i>Status *
+                    </label>
+                    <select name="status" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <option value="todo" selected>📝 To Do</option>
+                        <option value="in_progress">🔄 In Progress</option>
+                        <option value="review">👀 In Review</option>
+                        <option value="completed">✅ Completed</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Assign To and Due Date -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <i class="fas fa-user mr-2 text-purple-600"></i>Assign To
+                    </label>
+                    <select name="assigned_to"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <option value="">-- Select Team Member --</option>
+                        {% for member in members %}
+                        <option value="{{ member.id }}">
+                            {{ member.username }} ({{ member.get_role_display }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <p class="text-sm text-gray-500 mt-1">Leave empty to assign later</p>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <i class="fas fa-calendar mr-2 text-red-600"></i>Due Date
+                    </label>
+                    <input type="date" name="due_date"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <button type="submit" 
+                    class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition font-semibold shadow-lg">
+                    <i class="fas fa-save mr-2"></i>Create Task
+                </button>
+                <a href="{% url 'project_detail' project.pk %}" 
+                    class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition font-semibold text-center">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

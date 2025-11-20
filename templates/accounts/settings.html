@@ -1,0 +1,403 @@
+<!-- ============================================ -->
+<!-- FILE: templates/accounts/settings.html -->
+<!-- Settings page with forms -->
+<!-- ============================================ -->
+
+{% extends 'base.html' %}
+
+{% block title %}Settings - TaskMaster{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            <i class="fas fa-cog mr-2"></i>Settings
+        </h1>
+        <p class="text-gray-600">Manage your account settings and preferences</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- Settings Navigation -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-lg p-4 sticky top-4">
+                <nav class="space-y-2">
+                    <button onclick="showSection('profile')" 
+                        class="settings-nav-btn w-full text-left px-4 py-3 rounded-lg font-semibold transition active bg-blue-50 text-blue-600">
+                        <i class="fas fa-user mr-3"></i>Profile
+                    </button>
+                    <button onclick="showSection('account')" 
+                        class="settings-nav-btn w-full text-left px-4 py-3 rounded-lg font-semibold transition text-gray-700 hover:bg-gray-50">
+                        <i class="fas fa-shield-alt mr-3"></i>Account
+                    </button>
+                    <button onclick="showSection('password')" 
+                        class="settings-nav-btn w-full text-left px-4 py-3 rounded-lg font-semibold transition text-gray-700 hover:bg-gray-50">
+                        <i class="fas fa-key mr-3"></i>Password
+                    </button>
+                    <button onclick="showSection('notifications')" 
+                        class="settings-nav-btn w-full text-left px-4 py-3 rounded-lg font-semibold transition text-gray-700 hover:bg-gray-50">
+                        <i class="fas fa-bell mr-3"></i>Notifications
+                    </button>
+                    <button onclick="showSection('preferences')" 
+                        class="settings-nav-btn w-full text-left px-4 py-3 rounded-lg font-semibold transition text-gray-700 hover:bg-gray-50">
+                        <i class="fas fa-sliders-h mr-3"></i>Preferences
+                    </button>
+                    <a href="{% url 'profile' %}" 
+                        class="block w-full text-left px-4 py-3 rounded-lg font-semibold transition text-gray-700 hover:bg-gray-50">
+                        <i class="fas fa-arrow-left mr-3"></i>Back to Profile
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="lg:col-span-3">
+            <!-- Profile Settings -->
+            <div id="profile-section" class="settings-section">
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-user mr-2 text-blue-600"></i>Profile Information
+                    </h2>
+
+                    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <!-- Profile Photo -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-3">Profile Photo</label>
+                            <div class="flex items-center gap-4">
+                                {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="{{ user.username }}" 
+                                    class="w-20 h-20 rounded-full object-cover border-2 border-gray-300">
+                                {% else %}
+                                <div class="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-3xl font-bold">
+                                    {{ user.username.0|upper }}
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <input type="file" name="avatar" id="avatar" class="hidden" accept="image/*">
+                                    <label for="avatar" class="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition inline-block">
+                                        <i class="fas fa-upload mr-2"></i>Upload Photo
+                                    </label>
+                                    <p class="text-sm text-gray-500 mt-1">JPG, PNG or GIF (max 2MB)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- First and Last Name -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">First Name</label>
+                                <input type="text" name="first_name" value="{{ user.first_name }}"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                    placeholder="Enter first name">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Last Name</label>
+                                <input type="text" name="last_name" value="{{ user.last_name }}"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                    placeholder="Enter last name">
+                            </div>
+                        </div>
+
+                        <!-- Bio -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Bio</label>
+                            <textarea name="bio" rows="4"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                placeholder="Tell us about yourself...">{{ user.bio }}</textarea>
+                        </div>
+
+                        <!-- Phone -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Phone Number</label>
+                            <input type="tel" name="phone" value="{{ user.phone }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                placeholder="+1 234 567 8900">
+                        </div>
+
+                        <div class="flex gap-4">
+                            <button type="submit" 
+                                class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition font-semibold shadow-lg">
+                                <i class="fas fa-save mr-2"></i>Save Changes
+                            </button>
+                            <button type="reset" 
+                                class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition font-semibold">
+                                <i class="fas fa-undo mr-2"></i>Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Settings -->
+            <div id="account-section" class="settings-section hidden">
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-shield-alt mr-2 text-blue-600"></i>Account Settings
+                    </h2>
+
+                    <form method="POST" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Username</label>
+                            <input type="text" name="username" value="{{ user.username }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                placeholder="Enter username">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Email Address</label>
+                            <input type="email" name="email" value="{{ user.email }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                placeholder="your.email@example.com">
+                        </div>
+
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <p class="text-sm text-yellow-800">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                Changing your email will require verification
+                            </p>
+                        </div>
+
+                        <button type="submit" 
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition font-semibold shadow-lg">
+                            <i class="fas fa-save mr-2"></i>Save Preferences
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Preferences Settings -->
+            <div id="preferences-section" class="settings-section hidden">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-sliders-h mr-2 text-blue-600"></i>General Preferences
+                    </h2>
+
+                    <form method="POST" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <!-- Language -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">
+                                <i class="fas fa-language mr-2"></i>Language
+                            </label>
+                            <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                                <option value="en" selected>English</option>
+                                <option value="es">Español</option>
+                                <option value="fr">Français</option>
+                                <option value="de">Deutsch</option>
+                                <option value="hi">हिंदी</option>
+                            </select>
+                        </div>
+
+                        <!-- Timezone -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">
+                                <i class="fas fa-clock mr-2"></i>Timezone
+                            </label>
+                            <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                                <option value="Asia/Kolkata" selected>(GMT+5:30) India Standard Time</option>
+                                <option value="America/New_York">(GMT-5:00) Eastern Time</option>
+                                <option value="Europe/London">(GMT+0:00) London</option>
+                                <option value="Asia/Tokyo">(GMT+9:00) Tokyo</option>
+                            </select>
+                        </div>
+
+                        <!-- Theme -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">
+                                <i class="fas fa-palette mr-2"></i>Theme
+                            </label>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="border-2 border-blue-500 rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition">
+                                    <div class="bg-white h-20 rounded mb-2 border"></div>
+                                    <p class="text-center font-semibold text-gray-800">Light</p>
+                                </div>
+                                <div class="border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition">
+                                    <div class="bg-gray-900 h-20 rounded mb-2"></div>
+                                    <p class="text-center font-semibold text-gray-800">Dark</p>
+                                </div>
+                                <div class="border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition">
+                                    <div class="bg-gradient-to-br from-blue-500 to-purple-500 h-20 rounded mb-2"></div>
+                                    <p class="text-center font-semibold text-gray-800">Auto</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Date Format -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">
+                                <i class="fas fa-calendar-alt mr-2"></i>Date Format
+                            </label>
+                            <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                                <option value="mdy">MM/DD/YYYY (12/31/2024)</option>
+                                <option value="dmy" selected>DD/MM/YYYY (31/12/2024)</option>
+                                <option value="ymd">YYYY-MM-DD (2024-12-31)</option>
+                            </select>
+                        </div>
+
+                        <!-- Items per page -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">
+                                <i class="fas fa-list mr-2"></i>Items Per Page
+                            </label>
+                            <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" 
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition font-semibold shadow-lg">
+                            <i class="fas fa-save mr-2"></i>Save Preferences
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Settings navigation
+    function showSection(sectionName) {
+        // Hide all sections
+        document.querySelectorAll('.settings-section').forEach(section => {
+            section.classList.add('hidden');
+        });
+        
+        // Remove active class from all buttons
+        document.querySelectorAll('.settings-nav-btn').forEach(btn => {
+            btn.classList.remove('active', 'bg-blue-50', 'text-blue-600');
+            btn.classList.add('text-gray-700', 'hover:bg-gray-50');
+        });
+        
+        // Show selected section
+        document.getElementById(sectionName + '-section').classList.remove('hidden');
+        
+        // Add active class to clicked button
+        event.target.classList.add('active', 'bg-blue-50', 'text-blue-600');
+        event.target.classList.remove('text-gray-700', 'hover:bg-gray-50');
+    }
+</script>
+{% endblock %}to-purple-700 transition font-semibold shadow-lg">
+                            <i class="fas fa-save mr-2"></i>Update Account
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6">
+                    <h3 class="text-xl font-bold text-red-800 mb-4">
+                        <i class="fas fa-exclamation-circle mr-2"></i>Danger Zone
+                    </h3>
+                    <p class="text-red-700 mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+                    <button class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition font-semibold">
+                        <i class="fas fa-trash-alt mr-2"></i>Delete Account
+                    </button>
+                </div>
+            </div>
+
+            <!-- Password Settings -->
+            <div id="password-section" class="settings-section hidden">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-key mr-2 text-blue-600"></i>Change Password
+                    </h2>
+
+                    <form method="POST" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Current Password</label>
+                            <input type="password" name="current_password" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                placeholder="Enter current password">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">New Password</label>
+                            <input type="password" name="new_password" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                placeholder="Enter new password">
+                            <p class="text-sm text-gray-500 mt-1">Minimum 8 characters with letters and numbers</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Confirm New Password</label>
+                            <input type="password" name="confirm_password" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                placeholder="Confirm new password">
+                        </div>
+
+                        <button type="submit" 
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition font-semibold shadow-lg">
+                            <i class="fas fa-lock mr-2"></i>Change Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Notifications Settings -->
+            <div id="notifications-section" class="settings-section hidden">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-bell mr-2 text-blue-600"></i>Notification Preferences
+                    </h2>
+
+                    <form method="POST" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div>
+                                    <p class="font-semibold text-gray-800">Email Notifications</p>
+                                    <p class="text-sm text-gray-600">Receive email updates about your activity</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div>
+                                    <p class="font-semibold text-gray-800">Task Assignments</p>
+                                    <p class="text-sm text-gray-600">Get notified when tasks are assigned to you</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div>
+                                    <p class="font-semibold text-gray-800">Comments</p>
+                                    <p class="text-sm text-gray-600">Notify me when someone comments on my tasks</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div>
+                                    <p class="font-semibold text-gray-800">Project Updates</p>
+                                    <p class="text-sm text-gray-600">Get updates about project status changes</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" 
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:

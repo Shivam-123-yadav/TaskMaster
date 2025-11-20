@@ -1,0 +1,222 @@
+<!-- ============================================ -->
+<!-- FILE: templates/base.html -->
+<!-- Base template with navigation and layout -->
+<!-- ============================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}TaskMaster - Project Management{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <!-- Navigation Bar -->
+    {% if user.is_authenticated %}
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo and Brand -->
+                <div class="flex items-center space-x-8">
+                    <a href="{% url 'dashboard' %}" class="flex items-center space-x-2">
+                        <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
+                            <i class="fas fa-tasks text-white text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            TaskMaster
+                        </span>
+                    </a>
+                    
+                    <!-- Desktop Navigation Links -->
+                    <div class="hidden md:flex space-x-1">
+                        <a href="{% url 'dashboard' %}" class="text-gray-700 hover:bg-blue-50 hover:text-blue-600 px-4 py-2 rounded-md transition font-medium">
+                            <i class="fas fa-chart-line mr-2"></i>Dashboard
+                        </a>
+                        <a href="{% url 'project_list' %}" class="text-gray-700 hover:bg-blue-50 hover:text-blue-600 px-4 py-2 rounded-md transition font-medium">
+                            <i class="fas fa-folder-open mr-2"></i>Projects
+                        </a>
+                        <a href="{% url 'project_create' %}" class="text-gray-700 hover:bg-blue-50 hover:text-blue-600 px-4 py-2 rounded-md transition font-medium">
+                            <i class="fas fa-plus-circle mr-2"></i>New Project
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications (Optional) -->
+                    <button class="text-gray-600 hover:text-blue-600 relative">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                    </button>
+                    
+                    <!-- User Profile Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center space-x-3 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-500 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold">
+                                {{ user.username.0|upper }}
+                            </div>
+                            <div class="hidden md:block text-left">
+                                <p class="text-sm font-semibold text-gray-800">{{ user.username }}</p>
+                                <p class="text-xs text-gray-500">{{ user.get_role_display }}</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-600 text-xs"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
+                            <a href="{% url 'profile' %}" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="{% url 'settings' %}" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                <i class="fas fa-cog mr-2"></i>Settings
+                            </a>
+                            <hr class="my-2">
+                            <a href="{% url 'logout' %}" class="block px-4 py-2 text-red-600 hover:bg-red-50">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu (Optional) -->
+        <div class="md:hidden px-4 pb-4">
+            <a href="{% url 'dashboard' %}" class="block text-gray-700 hover:bg-blue-50 hover:text-blue-600 px-4 py-2 rounded-md mb-1">
+                <i class="fas fa-chart-line mr-2"></i>Dashboard
+            </a>
+            <a href="{% url 'project_list' %}" class="block text-gray-700 hover:bg-blue-50 hover:text-blue-600 px-4 py-2 rounded-md mb-1">
+                <i class="fas fa-folder-open mr-2"></i>Projects
+            </a>
+            <a href="{% url 'project_create' %}" class="block text-gray-700 hover:bg-blue-50 hover:text-blue-600 px-4 py-2 rounded-md">
+                <i class="fas fa-plus-circle mr-2"></i>New Project
+            </a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    {% if messages %}
+    <div class="max-w-7xl mx-auto px-4 mt-4 space-y-2">
+        {% for message in messages %}
+        <div class="fade-in flex items-center justify-between bg-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-100 border-l-4 border-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-500 text-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-700 px-4 py-3 rounded shadow-md" role="alert">
+            <div class="flex items-center">
+                <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} mr-3 text-xl"></i>
+                <span class="font-medium">{{ message }}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-700 hover:text-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-900">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">TaskMaster</h3>
+                    <p class="text-gray-600 text-sm">Professional project management and team collaboration platform.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{% url 'dashboard' %}" class="text-gray-600 hover:text-blue-600">Dashboard</a></li>
+                        <li><a href="{% url 'project_list' %}" class="text-gray-600 hover:text-blue-600">Projects</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-blue-600">Documentation</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-600 hover:text-blue-600"><i class="fab fa-github text-2xl"></i></a>
+                        <a href="#" class="text-gray-600 hover:text-blue-600"><i class="fab fa-linkedin text-2xl"></i></a>
+                        <a href="#" class="text-gray-600 hover:text-blue-600"><i class="fab fa-twitter text-2xl"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t mt-8 pt-8 text-center text-gray-600 text-sm">
+                <p>&copy; 2024 TaskMaster. Built with <i class="fas fa-heart text-red-500"></i> using Django & Tailwind CSS</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Extra JavaScript -->
+    <script>
+        // Auto-hide flash messages after 5 seconds
+        setTimeout(() => {
+            const messages = document.querySelectorAll('[role="alert"]');
+            messages.forEach(msg => {
+                msg.style.transition = 'opacity 0.5s';
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 500);
+            });
+        }, 5000);
+
+        function setNotificationCount(count) {
+          const badge = document.querySelector('.notif-badge');
+          if (!badge) return;
+          badge.textContent = count;
+          badge.setAttribute('data-count', String(count));
+          badge.style.display = count > 0 ? 'flex' : 'none';
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

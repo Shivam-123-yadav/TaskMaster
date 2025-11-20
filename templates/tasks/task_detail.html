@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }} - TaskMaster{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+            <!-- Task Header -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
+                    <div class="flex-1">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-3">{{ task.title }}</h1>
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <span class="px-3 py-1.5 rounded-full text-sm font-semibold
+                                {% if task.status == 'completed' %}bg-green-100 text-green-800
+                                {% elif task.status == 'in_progress' %}bg-blue-100 text-blue-800
+                                {% elif task.status == 'review' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ task.get_status_display }}
+                            </span>
+                            <span class="px-3 py-1.5 rounded-full text-sm font-semibold
+                                {% if task.priority == 'urgent' %}bg-red-100 text-red-800
+                                {% elif task.priority == 'high' %}bg-orange-100 text-orange-800
+                                {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ task.get_priority_display }} Priority
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Link -->
+                <div class="mb-6 pb-6 border-b">
+                    <a href="{% url 'project_detail' task.project.pk %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold hover:underline">
+                        <i class="fas fa-folder mr-2"></i>{{ task.project.name }}
+                        <i class="fas fa-external-link-alt ml-2 text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3">
+                        <i class="fas fa-file-alt mr-2 text-blue-600"></i>Description
+                    </h3>
+                    <p class="text-gray-700 leading-relaxed">{{ task.description }}</p>
+                </div>
+
+                <!-- Update Status -->
+                <div class="border-t pt-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-sync-alt mr-2 text-green-600"></i>Update Status
+                    </h3>
+                    <form method="POST" action="{% url 'task_update_status' task.pk %}" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        {% csrf_token %}
+                        <select name="status" 
+                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <option value="todo" {% if task.status == 'todo' %}selected{% endif %}>📝 To Do</option>
+                            <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>🔄 In Progress</option>
+                            <option value="review" {% if task.status == 'review' %}selected{% endif %}>👀 In Review</option>
+                            <option value="completed" {% if task.status == 'completed' %}selected{% endif %}>✅ Completed</option>
+                        </select>
+                        <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition font-semibold shadow-md">
+                            <i class="fas fa-save mr-2"></i>Update
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-comments mr-2 text-purple-600"></i>Comments ({{ comments.count }})
+                </h3>
+
+                <!-- Add Comment Form -->
+                <form method="POST" action="{% url 'comment_create' task.pk %}" class="mb-6">
+                    {% csrf_token %}
+                    <textarea name="content" required rows="3" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition mb-3"
+                        placeholder="Add your comment..."></textarea>
+                    <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition font-semibold shadow-md">
+                        <i class="fas fa-paper-plane mr-2"></i>Post Comment
+                    </button>
+                </form>
+
+                <!-- Comments List -->
+                <div class="space-y-4">
+                    {% for comment in comments %}
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <div class="flex items-start gap-3">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-500 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                                {{ comment.user.username.0|upper }}
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div>
+                                        <span class="font-semibold text-gray-800">{{ comment.user.username }}</span>
+                                        <span class="text-xs text-gray-500 ml-2">
+                                            <i class="fas fa-clock mr-1"></i>{{ comment.created_at|date:"M d, Y H:i" }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <p class="text-gray-700 leading-relaxed">{{ comment.content }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-12 bg-gray-50 rounded-lg">
+                        <i class="fas fa-comments text-gray-300 text-5xl mb-3"></i>
+                        <p class="text-gray-500">No comments yet. Be the first to comment!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1">
+            <!-- Task Details Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6 sticky top-4">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">
+                    <i class="fas fa-info-circle mr-2 text-blue-600"></i>Task Details
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="pb-4 border-b">
+                        <p class="text-sm text-gray-500 mb-2">
+                            <i class="fas fa-flag mr-2"></i>Priority
+                        </p>
+                        <span class="inline-block px-3 py-1.5 rounded-full text-sm font-semibold
+                            {% if task.priority == 'urgent' %}bg-red-100 text-red-800
+                            {% elif task.priority == 'high' %}bg-orange-100 text-orange-800
+                            {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-green-100 text-green-800{% endif %}">
+                            {{ task.get_priority_display }}
+                        </span>
+                    </div>
+
+                    <div class="pb-4 border-b">
+                        <p class="text-sm text-gray-500 mb-2">
+                            <i class="fas fa-user-check mr-2"></i>Assigned To
+                        </p>
+                        {% if task.assigned_to %}
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-2">
+                                {{ task.assigned_to.username.0|upper }}
+                            </div>
+                            <span class="font-semibold text-gray-800">{{ task.assigned_to.username }}</span>
+                        </div>
+                        {% else %}
+                        <span class="text-gray-500 italic">Unassigned</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="pb-4 border-b">
+                        <p class="text-sm text-gray-500 mb-2">
+                            <i class="fas fa-user-plus mr-2"></i>Created By
+                        </p>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-2">
+                                {{ task.created_by.username.0|upper }}
+                            </div>
+                            <span class="font-semibold text-gray-800">{{ task.created_by.username }}</span>
+                        </div>
+                    </div>
+
+                    {% if task.due_date %}
+                    <div class="pb-4 border-b">
+                        <p class="text-sm text-gray-500 mb-2">
+                            <i class="fas fa-calendar-alt mr-2"></i>Due Date
+                        </p>
+                        <p class="font-semibold text-gray-800">{{ task.due_date|date:"F d, Y" }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="pb-4 border-b">
+                        <p class="text-sm text-gray-500 mb-2">
+                            <i class="fas fa-clock mr-2"></i>Created
+                        </p>
+                        <p class="font-semibold text-gray-800">{{ task.created_at|date:"M d, Y H:i" }}</p>
+                    </div>
+
+                    <div>
+                        <p class="text-sm text-gray-500 mb-2">
+                            <i class="fas fa-sync mr-2"></i>Last Updated
+                        </p>
+                        <p class="font-semibold text-gray-800">{{ task.updated_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-6">
+                <h3 class="font-bold text-gray-800 mb-2">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>Need Help?
+                </h3>
+                <p class="text-sm text-gray-700">
+                    Contact your project manager or team lead for assistance with this task.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

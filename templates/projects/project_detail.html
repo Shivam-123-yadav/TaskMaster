@@ -1,0 +1,264 @@
+<!-- ============================================ -->
+<!-- FILE: templates/projects/project_detail.html -->
+<!-- Project detail with Kanban board -->
+<!-- ============================================ -->
+
+{% extends 'base.html' %}
+
+{% block title %}{{ project.name }} - TaskMaster{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Project Header -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                    <h1 class="text-3xl font-bold text-gray-800">{{ project.name }}</h1>
+                    <span class="px-4 py-1.5 rounded-full text-sm font-semibold
+                        {% if project.status == 'active' %}bg-green-100 text-green-800
+                        {% elif project.status == 'planning' %}bg-blue-100 text-blue-800
+                        {% elif project.status == 'on_hold' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ project.get_status_display }}
+                    </span>
+                </div>
+                <p class="text-gray-600">{{ project.description }}</p>
+            </div>
+            <a href="{% url 'task_create' project.pk %}" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition shadow-lg font-semibold">
+                <i class="fas fa-plus mr-2"></i>Add Task
+            </a>
+        </div>
+        
+        <!-- Project Meta Info -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Owner</p>
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xs mr-2">
+                        {{ project.owner.username.0|upper }}
+                    </div>
+                    <p class="font-semibold text-gray-800">{{ project.owner.username }}</p>
+                </div>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Team Members</p>
+                <p class="font-semibold text-gray-800">
+                    <i class="fas fa-users text-purple-500 mr-1"></i>{{ project.members.count }}
+                </p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Total Tasks</p>
+                <p class="font-semibold text-gray-800">
+                    <i class="fas fa-tasks text-blue-500 mr-1"></i>{{ tasks.count }}
+                </p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Progress</p>
+                <p class="font-semibold text-gray-800">
+                    <i class="fas fa-chart-pie text-green-500 mr-1"></i>{{ project.get_progress }}%
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">
+            <i class="fas fa-columns mr-2 text-blue-600"></i>Task Board
+        </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- To Do Column -->
+        <div class="bg-gray-50 rounded-xl p-4 min-h-screen">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-gray-700 flex items-center">
+                    <span class="bg-gray-500 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm mr-2">
+                        {{ todo_tasks.count }}
+                    </span>
+                    To Do
+                </h3>
+                <i class="fas fa-ellipsis-h text-gray-400"></i>
+            </div>
+            <div class="space-y-3">
+                {% for task in todo_tasks %}
+                <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer border-l-4 border-gray-500">
+                    <a href="{% url 'task_detail' task.pk %}" class="block">
+                        <div class="flex items-start justify-between mb-2">
+                            <h4 class="font-semibold text-gray-800 flex-1">{{ task.title }}</h4>
+                            <span class="px-2 py-1 rounded text-xs font-semibold ml-2
+                                {% if task.priority == 'urgent' %}bg-red-100 text-red-800
+                                {% elif task.priority == 'high' %}bg-orange-100 text-orange-800
+                                {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ task.get_priority_display }}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">{{ task.description|truncatewords:10 }}</p>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            {% if task.assigned_to %}
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs mr-1">
+                                    {{ task.assigned_to.username.0|upper }}
+                                </div>
+                                <span>{{ task.assigned_to.username }}</span>
+                            </div>
+                            {% else %}
+                            <span class="text-gray-400">Unassigned</span>
+                            {% endif %}
+                            {% if task.due_date %}
+                            <span><i class="fas fa-calendar mr-1"></i>{{ task.due_date|date:"M d" }}</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-gray-400 text-sm text-center py-8">No tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- In Progress Column -->
+        <div class="bg-blue-50 rounded-xl p-4 min-h-screen">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-gray-700 flex items-center">
+                    <span class="bg-blue-500 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm mr-2">
+                        {{ in_progress_tasks.count }}
+                    </span>
+                    In Progress
+                </h3>
+                <i class="fas fa-ellipsis-h text-gray-400"></i>
+            </div>
+            <div class="space-y-3">
+                {% for task in in_progress_tasks %}
+                <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer border-l-4 border-blue-500">
+                    <a href="{% url 'task_detail' task.pk %}" class="block">
+                        <div class="flex items-start justify-between mb-2">
+                            <h4 class="font-semibold text-gray-800 flex-1">{{ task.title }}</h4>
+                            <span class="px-2 py-1 rounded text-xs font-semibold ml-2
+                                {% if task.priority == 'urgent' %}bg-red-100 text-red-800
+                                {% elif task.priority == 'high' %}bg-orange-100 text-orange-800
+                                {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ task.get_priority_display }}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">{{ task.description|truncatewords:10 }}</p>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            {% if task.assigned_to %}
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs mr-1">
+                                    {{ task.assigned_to.username.0|upper }}
+                                </div>
+                                <span>{{ task.assigned_to.username }}</span>
+                            </div>
+                            {% else %}
+                            <span class="text-gray-400">Unassigned</span>
+                            {% endif %}
+                            {% if task.due_date %}
+                            <span><i class="fas fa-calendar mr-1"></i>{{ task.due_date|date:"M d" }}</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-gray-400 text-sm text-center py-8">No tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- In Review Column -->
+        <div class="bg-yellow-50 rounded-xl p-4 min-h-screen">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-gray-700 flex items-center">
+                    <span class="bg-yellow-500 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm mr-2">
+                        {{ review_tasks.count }}
+                    </span>
+                    In Review
+                </h3>
+                <i class="fas fa-ellipsis-h text-gray-400"></i>
+            </div>
+            <div class="space-y-3">
+                {% for task in review_tasks %}
+                <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer border-l-4 border-yellow-500">
+                    <a href="{% url 'task_detail' task.pk %}" class="block">
+                        <div class="flex items-start justify-between mb-2">
+                            <h4 class="font-semibold text-gray-800 flex-1">{{ task.title }}</h4>
+                            <span class="px-2 py-1 rounded text-xs font-semibold ml-2
+                                {% if task.priority == 'urgent' %}bg-red-100 text-red-800
+                                {% elif task.priority == 'high' %}bg-orange-100 text-orange-800
+                                {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ task.get_priority_display }}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">{{ task.description|truncatewords:10 }}</p>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            {% if task.assigned_to %}
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-xs mr-1">
+                                    {{ task.assigned_to.username.0|upper }}
+                                </div>
+                                <span>{{ task.assigned_to.username }}</span>
+                            </div>
+                            {% else %}
+                            <span class="text-gray-400">Unassigned</span>
+                            {% endif %}
+                            {% if task.due_date %}
+                            <span><i class="fas fa-calendar mr-1"></i>{{ task.due_date|date:"M d" }}</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-gray-400 text-sm text-center py-8">No tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Completed Column -->
+        <div class="bg-green-50 rounded-xl p-4 min-h-screen">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-gray-700 flex items-center">
+                    <span class="bg-green-500 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm mr-2">
+                        {{ completed_tasks.count }}
+                    </span>
+                    Completed
+                </h3>
+                <i class="fas fa-ellipsis-h text-gray-400"></i>
+            </div>
+            <div class="space-y-3">
+                {% for task in completed_tasks %}
+                <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer border-l-4 border-green-500 opacity-75">
+                    <a href="{% url 'task_detail' task.pk %}" class="block">
+                        <div class="flex items-start justify-between mb-2">
+                            <h4 class="font-semibold text-gray-800 flex-1 line-through">{{ task.title }}</h4>
+                            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">{{ task.description|truncatewords:10 }}</p>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            {% if task.assigned_to %}
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-xs mr-1">
+                                    {{ task.assigned_to.username.0|upper }}
+                                </div>
+                                <span>{{ task.assigned_to.username }}</span>
+                            </div>
+                            {% else %}
+                            <span class="text-gray-400">Unassigned</span>
+                            {% endif %}
+                            {% if task.completed_at %}
+                            <span><i class="fas fa-check mr-1"></i>{{ task.completed_at|date:"M d" }}</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-gray-400 text-sm text-center py-8">No tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

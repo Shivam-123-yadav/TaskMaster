@@ -5,6 +5,8 @@ TaskMaster is a full-featured **project management and team collaboration** plat
 task management, comments, and a modern UI.
 
 ---
+<img width="1919" height="996" alt="image" src="https://github.com/user-attachments/assets/55a8b899-298c-452b-99be-a451d81477de" />
+
 
 ## ⭐ Features
 
@@ -184,5 +186,6 @@ Copy code
 Bol dena — main turbo-short version bhi bana dunga.
 
 Agar README me **project screenshots**, **demo video**, **badges**, **install script**, **logo** add karna ho to bhi batao bhai ❤️🚀
+
 
 

@@ -176,16 +176,6 @@ This project is open-source under the MIT License.
 ❤️ Author
 Developed by Shivam — feel free to connect!
 
-yaml
-Copy code
-
----
-
-# 🔥 Want a "Short Version" (~10 lines) for GitHub?  
-Bol dena — main turbo-short version bhi bana dunga.
-
-Agar README me **project screenshots**, **demo video**, **badges**, **install script**, **logo** add karna ho to bhi batao bhai ❤️🚀
-
 
 
 
